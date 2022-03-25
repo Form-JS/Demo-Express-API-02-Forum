@@ -13,8 +13,16 @@ const app = express();
 // Add Middlewares
 app.use(express.json());
 
-// TODO Initialize Database
-// ...
+// Initialize Database
+const db = require('./models');
+db.sequelize.authenticate()
+    .then(() => console.log('Connection DB - OK'))
+    .catch((error) => console.log('Connection DB - Error', error));
+
+// Sync between models and database (Required DDL right)
+if (NODE_ENV !== 'production') {
+    db.sequelize.sync({ alter: true });
+}
 
 // TODO Add Routing
 // ...
