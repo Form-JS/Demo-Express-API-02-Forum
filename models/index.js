@@ -25,10 +25,15 @@ db.sequelize = sequelize;
 db.Category = require('./category')(sequelize);
 db.Message = require('./message')(sequelize);
 db.Subject = require('./subject')(sequelize);
+db.CategorySubject = require('./categorySubject')(sequelize);
 
 // Add Association
+// - [One to Many] Subject - Message
 db.Subject.hasMany(db.Message, { onDelete: 'NO ACTION', onUpdate: 'CASCADE' });
 db.Message.belongsTo(db.Subject);
+// - [Many to Many] Subject - Category
+db.Subject.belongsToMany(db.Category, { through: db.CategorySubject });
+db.Category.belongsToMany(db.Subject, { through: db.CategorySubject });
 
 // Export object DB
 module.exports = db;
