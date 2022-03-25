@@ -9,7 +9,7 @@ module.exports = (sequelize) => {
             allowNull: false
         }
     }, {
-        tableName: 'subjectMessage'
+        tableName: 'subjectMessages'
     });
 
     return Message;
