@@ -21,8 +21,9 @@ const db = {};
 // Add instance of Sequelize
 db.sequelize = sequelize;
 
-// TODO Add Models
+// Add Models
 db.Category = require('./category')(sequelize);
+db.Subject = require('./subject')(sequelize);
 
 // Export object DB
 module.exports = db;
