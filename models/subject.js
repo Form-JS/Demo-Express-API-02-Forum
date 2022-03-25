@@ -3,7 +3,7 @@ const { DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
 
     // Initialize Subject model
-    const Subject = sequelize.define('Subject', {
+    const Subject = sequelize.define('subject', {
         name: {
             type: DataTypes.STRING,
             allowNull: false
