@@ -21,11 +21,12 @@ db.sequelize.authenticate()
 
 // Sync between models and database (Required DDL right)
 if (NODE_ENV !== 'production') {
-    db.sequelize.sync({ force: true });
+    db.sequelize.sync();
 }
 
-// TODO Add Routing
-// ...
+// Add Routing
+const router = require('./routes');
+app.use('/api', router);
 
 // Start Web API
 app.listen(PORT, () => {
