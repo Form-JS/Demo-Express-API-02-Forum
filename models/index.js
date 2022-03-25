@@ -23,7 +23,12 @@ db.sequelize = sequelize;
 
 // Add Models
 db.Category = require('./category')(sequelize);
+db.Message = require('./message')(sequelize);
 db.Subject = require('./subject')(sequelize);
+
+// Add Association
+db.Subject.hasMany(db.Message, { onDelete: 'NO ACTION', onUpdate: 'CASCADE' });
+db.Message.belongsTo(db.Subject);
 
 // Export object DB
 module.exports = db;
