@@ -2,7 +2,7 @@ const express = require('express');
 require('express-async-errors');
 
 // Load env file
-require('dotenv-flow').config;
+require('dotenv-flow').config();
 
 // Get env variable
 const { PORT, NODE_ENV } = process.env;
