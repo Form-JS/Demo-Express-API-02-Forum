@@ -1,6 +1,14 @@
 const { Request, Response, NextFunction } = require('express');
+const { BaseSchema } = require('yup');
 
+/**
+ * Middleware de validation Yup
+ * @param {BaseSchema} yupValidator 
+ * @param {number} errorCode 
+ * @returns {(req: Request, res: Response, next: NextFunction) => Void)}
+ */
 const bodyValidation = (yupValidator, errorCode = 422) => {
+
     /**
      * Middleware pour valider les donnée du body via un validator Yup
      * @param {Request} req 
@@ -9,7 +17,7 @@ const bodyValidation = (yupValidator, errorCode = 422) => {
      */
     return (req, res, next) => {
 
-        yupValidator.validate(req.body, { abortEarly: false })
+        yupValidator.noUnknown().validate(req.body, { abortEarly: false })
             .then((data) => {
                 // Ajout d'une propriété "validedData" avec les données validées par yup
                 req.validatedData = data;
