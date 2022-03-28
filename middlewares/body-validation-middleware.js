@@ -1,0 +1,43 @@
+const { Request, Response, NextFunction } = require('express');
+
+const bodyValidation = (yupValidator, errorCode = 422) => {
+    /**
+     * Middleware pour valider les donnée du body via un validator Yup
+     * @param {Request} req 
+     * @param {Response} res 
+     * @param {NextFunction} next 
+     */
+    return (req, res, next) => {
+
+        yupValidator.validate(req.body, { abortEarly: false })
+            .then((data) => {
+                // Ajout d'une propriété "validedData" avec les données validées par yup
+                req.validatedData = data;
+
+                // Appel de la méthode "next"
+                next();
+            })
+            .catch(yupError => {
+                // Création d'un object "errors" sur base de données de validation Yup
+                const errors = yupError.inner.reduce((acc, error) => {
+                    const { path, message } = error;
+                    if (!acc.hasOwnProperty(path)) {
+                        acc[path] = [message];
+                    }
+                    else {
+                        acc[path].push(message);
+                    }
+                    return acc;
+                }, {});
+
+                // Envoi d'un réponse d'erreur formatté
+                res.status(errorCode).json({
+                    status: errorCode,
+                    errors,
+                    values: yupError.value
+                });
+            });
+    };
+};
+
+module.exports = bodyValidation;

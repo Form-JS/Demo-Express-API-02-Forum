@@ -23,9 +23,7 @@ const categoryController = {
     },
 
     add: async (req, res) => {
-        const data = {
-            name: req.body.name
-        };
+        const data = req.validatedData;
 
         const newCategory = await db.Category.create(data);
         res.json(newCategory);
@@ -33,9 +31,7 @@ const categoryController = {
 
     update: async (req, res) => {
         const id = parseInt(req.params.id);
-        const data = {
-            name: req.body.name
-        };
+        const data = req.validatedData;
 
         const resultUpdate = await db.Category.update(data, {
             where: { id },   // Ecriture simplifié -> { id: id }
