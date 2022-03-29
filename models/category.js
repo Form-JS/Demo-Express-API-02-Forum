@@ -1,4 +1,10 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, Sequelize } = require('sequelize');
+
+/**
+ * Représentation du model Category
+ * @param {Sequelize} sequelize
+ * @returns
+ */
 
 module.exports = (sequelize) => {
 
