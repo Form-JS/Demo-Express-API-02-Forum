@@ -1,5 +1,6 @@
 const subjectController = require('../controllers/subject-controller');
 const bodyValidation = require('../middlewares/body-validation-middleware');
+const { messageValidator } = require('../validators/message-validator');
 const { subjectValidator, subjectUpdateValidator, subjectCategoriesValidator } = require('../validators/subject-validator');
 
 
@@ -25,11 +26,6 @@ subjectRouter.route('/:id([0-9]+)/RemoveCategories')
 // Routes pour les messages
 subjectRouter.route('/:id([0-9]+)/message')
     .get(subjectController.getAllMessage)
-    .post(subjectController.addMessage);
-
-subjectRouter.route('/:id([0-9]+)/message/:messageId([0-9]+)')
-    .get(subjectController.getMessageById)
-    .put(subjectController.updateMessage)
-    .delete(subjectController.deleteMessage);
+    .post(bodyValidation(messageValidator), subjectController.addMessage);
 
 module.exports = subjectRouter;

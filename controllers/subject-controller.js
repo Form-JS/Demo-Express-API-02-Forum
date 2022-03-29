@@ -4,6 +4,7 @@ const { SuccessArrayResponse, SuccessObjectResponse } = require('../response-sch
 
 const subjectController = {
 
+    // Actions principals
     getAll: async (req, res) => {
         const { offset, limit } = req.pagination;
 
@@ -105,7 +106,7 @@ const subjectController = {
         res.sendStatus(204);
     },
 
-
+    // Manipulation des categories
     addCategories: async (req, res) => {
         const id = parseInt(req.params.id);
         const data = req.validatedData;
@@ -148,22 +149,45 @@ const subjectController = {
         res.json(new SuccessObjectResponse(subject));
     },
 
-
+    // Manipulation des messages
     getAllMessage: async (req, res) => {
-        res.sendStatus(501);
+        const subjectId = parseInt(req.params.id);
+        const { offset, limit } = req.pagination;
+
+        const { rows, count } = await db.Message.findAndCountAll({
+            attributes: {
+                exclude: ['subjectId']
+            },
+            where: { subjectId },
+            order: [['createdAt', 'DESC']],
+            offset,
+            limit
+        });
+
+        res.json(new SuccessArrayResponse(rows, count));
     },
-    getMessageById: async (req, res) => {
-        res.sendStatus(501);
-    },
+
     addMessage: async (req, res) => {
-        res.sendStatus(501);
-    },
-    updateMessage: async (req, res) => {
-        res.sendStatus(501);
-    },
-    deleteMessage: async (req, res) => {
-        res.sendStatus(501);
-    },
+        const subjectId = parseInt(req.params.id);
+        const data = req.validatedData;
+
+        const subject = await db.Subject.findByPk(subjectId);
+        if (!subject) {
+            return res.status(404).json(new NotFoundErrorResponse('Subject not found'));
+        }
+
+        const transaction = await db.sequelize.transaction();
+        try {
+            const message = await subject.createMessage(data, { transaction });
+            await transaction.commit();
+
+            res.json(new SuccessObjectResponse(message));
+        }
+        catch (error) {
+            transaction.rollback();
+            throw error;
+        }
+    }
 };
 
 module.exports = subjectController;
