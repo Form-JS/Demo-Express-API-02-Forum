@@ -10,10 +10,10 @@ const subjectController = {
         const { rows, count } = await db.Subject.findAndCountAll({
             offset,
             limit,
-            // include: db.Category          // Many to Many avec toutes les infos (donc la table intermediaire)
-            include: {                       // Many to Many customisé
+            // include: db.Category           // Many to Many avec toutes les infos (donc la table intermediaire)
+            include: {                        // Many to Many customisé
                 model: db.Category,
-                through: { attributes: [] }  // -> Permet de selectionner les infos de la table intermediaire
+                through: { attributes: [] },  // -> Permet de selectionner les infos de la table intermediaire
             }
         });
         res.json(new SuccessArrayResponse(rows, count));
@@ -145,8 +145,24 @@ const subjectController = {
         // -> subject.removeCategories(data.categories);
 
         res.json(new SuccessObjectResponse(subject));
-    }
+    },
 
+
+    getAllMessage: async (req, res) => {
+        res.sendStatus(501);
+    },
+    getMessageById: async (req, res) => {
+        res.sendStatus(501);
+    },
+    addMessage: async (req, res) => {
+        res.sendStatus(501);
+    },
+    updateMessage: async (req, res) => {
+        res.sendStatus(501);
+    },
+    deleteMessage: async (req, res) => {
+        res.sendStatus(501);
+    },
 };
 
 module.exports = subjectController;
