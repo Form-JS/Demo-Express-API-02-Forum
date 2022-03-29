@@ -1,5 +1,6 @@
 const { Request, Response, NextFunction } = require('express');
 const { BaseSchema } = require('yup');
+const { ErrorResponse, InvalidFieldErrorResponse } = require('../response-schemas/error-schema');
 
 /**
  * Middleware de validation Yup
@@ -39,11 +40,11 @@ const bodyValidation = (yupValidator, errorCode = 422) => {
                 }, {});
 
                 // Envoi d'un réponse d'erreur formatté
-                res.status(errorCode).json({
-                    status: errorCode,
+                res.status(errorCode).json(new InvalidFieldErrorResponse(
+                    'Data invalid',
                     errors,
-                    values: yupError.value
-                });
+                    errorCode
+                ));
             });
     };
 };

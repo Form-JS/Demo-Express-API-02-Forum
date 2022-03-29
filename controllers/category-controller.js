@@ -1,14 +1,17 @@
 const db = require('../models');
+const { NotFoundErrorResponse, ErrorResponse } = require('../response-schemas/error-schema');
+const { SuccessObjectResponse, SuccessArrayResponse } = require('../response-schemas/succes-schema');
 
 const categoryController = {
 
     getAll: async (req, res) => {
-        const categories = await db.Category.findAll({
+        const data = await db.Category.findAndCountAll({
             order: [['name', 'ASC']],
             offset: req.pagination.offset,
             limit: req.pagination.limit
         });
-        res.json(categories);
+
+        res.json(new SuccessArrayResponse(data.rows, data.count));
     },
 
     getById: async (req, res) => {
@@ -19,16 +22,16 @@ const categoryController = {
         });
 
         if (!category) {
-            return res.sendStatus(404);
+            return res.status(404).json(new NotFoundErrorResponse('Category not found'));
         }
-        res.json(category);
+        res.json(new SuccessObjectResponse(category));
     },
 
     add: async (req, res) => {
         const data = req.validatedData;
 
         const newCategory = await db.Category.create(data);
-        res.json(newCategory);
+        res.json(new SuccessObjectResponse(newCategory));
     },
 
     update: async (req, res) => {
@@ -43,12 +46,12 @@ const categoryController = {
         // Nombre de row modifier
         const nbRow = resultUpdate[0];
         if (nbRow !== 1) {
-            return res.sendStatus(400);
+            return res.status(400).json(new ErrorResponse('Error during update'));
         }
 
         // Tableau avec les valeurs mise à jours (Ne fonctionne pas sur MySQL / MariaDB)
         const updatedData = resultUpdate[1];
-        res.status(200).json(updatedData[0]);
+        res.status(200).json(new SuccessObjectResponse(updatedData[0]));
     },
 
     delete: async (req, res) => {
@@ -59,7 +62,7 @@ const categoryController = {
         });
 
         if (nbRow !== 1) {
-            return res.sendStatus(404);
+            return res.status(404).json(new NotFoundErrorResponse('Category not found'));
         }
         res.sendStatus(204);
     }
