@@ -3,7 +3,11 @@ const db = require('../models');
 const subjectController = {
 
     getAll: async (req, res) => {
+        const { offset, limit } = req.pagination;
+
         const subjects = await db.Subject.findAll({
+            offset,
+            limit,
             // include: db.Category          // Many to Many avec toutes les infos (donc la table intermediaire)
             include: {                       // Many to Many customisé
                 model: db.Category,

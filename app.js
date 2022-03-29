@@ -1,4 +1,5 @@
 const express = require('express');
+const pagination = require('./middlewares/pagination-middleware');
 require('express-async-errors');
 
 // Load env file
@@ -12,6 +13,7 @@ const app = express();
 
 // Add Middlewares
 app.use(express.json());
+app.use(pagination());
 
 // Initialize Database
 const db = require('./models');

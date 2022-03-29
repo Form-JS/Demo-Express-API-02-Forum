@@ -4,7 +4,9 @@ const categoryController = {
 
     getAll: async (req, res) => {
         const categories = await db.Category.findAll({
-            order: [['name', 'ASC']]
+            order: [['name', 'ASC']],
+            offset: req.pagination.offset,
+            limit: req.pagination.limit
         });
         res.json(categories);
     },
