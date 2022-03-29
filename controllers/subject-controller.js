@@ -8,6 +8,7 @@ const subjectController = {
         const { offset, limit } = req.pagination;
 
         const { rows, count } = await db.Subject.findAndCountAll({
+            distinct: true,                   // Fix le probleme de count (Permet de ne pas compter les ligne d'un INNER JOIN)
             offset,
             limit,
             // include: db.Category           // Many to Many avec toutes les infos (donc la table intermediaire)
