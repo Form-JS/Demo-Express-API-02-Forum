@@ -6,7 +6,7 @@ const { ErrorResponse, InvalidFieldErrorResponse } = require('../response-schema
  * Middleware de validation Yup
  * @param {BaseSchema} yupValidator 
  * @param {number} errorCode 
- * @returns {(req: Request, res: Response, next: NextFunction) => Void)}
+ * @returns {(req: Request, res: Response, next: NextFunction) => Void}
  */
 const bodyValidation = (yupValidator, errorCode = 422) => {
 
