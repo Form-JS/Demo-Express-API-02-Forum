@@ -8,7 +8,7 @@ const { DataTypes, Sequelize } = require('sequelize');
 module.exports = (sequelize) => {
 
     // Initialize Member model
-    const Member = sequelize.define('Member', {
+    const Member = sequelize.define('member', {
         // Attributs
         pseudo: {
             type: DataTypes.STRING(50),
