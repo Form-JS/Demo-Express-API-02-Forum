@@ -26,14 +26,39 @@ db.Category = require('./category')(sequelize);
 db.Message = require('./message')(sequelize);
 db.Subject = require('./subject')(sequelize);
 db.CategorySubject = require('./categorySubject')(sequelize);
+db.Member = require('./member')(sequelize);
 
 // Add Association
-// - [One to Many] Subject - Message
-db.Subject.hasMany(db.Message, { onDelete: 'NO ACTION', onUpdate: 'CASCADE' });
+// - [One to Many] Message - Subject
+db.Subject.hasMany(db.Message, {
+    foreignKey: {
+        allowNull: false
+    },
+    onDelete: 'NO ACTION',
+    onUpdate: 'CASCADE'
+});
 db.Message.belongsTo(db.Subject);
 // - [Many to Many] Subject - Category
 db.Subject.belongsToMany(db.Category, { through: db.CategorySubject });
 db.Category.belongsToMany(db.Subject, { through: db.CategorySubject });
+// - [One to Many] Subject - Member 
+db.Member.hasMany(db.Subject, {
+    foreignKey: {
+        allowNull: false
+    },
+    onDelete: 'NO ACTION',
+    onUpdate: 'CASCADE'
+});
+db.Subject.belongsTo(db.Member);
+// - [One to Many] Message - Member  
+db.Member.hasMany(db.Message, {
+    foreignKey: {
+        allowNull: false
+    },
+    onDelete: 'NO ACTION',
+    onUpdate: 'CASCADE'
+});
+db.Message.belongsTo(db.Member);
 
 // Export object DB
 module.exports = db;
