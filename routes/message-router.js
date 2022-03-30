@@ -6,7 +6,7 @@ const messageRouter = require('express').Router();
 
 messageRouter.route('/:id([0-9]+)')
     .get(messageController.getById)
-    .put(bodyValidation(messageValidator), messageController.update)
-    .delete(messageController.delete);
+    .put(authentificateJwt(), bodyValidation(messageValidator), messageController.update)
+    .delete(authentificateJwt(), messageController.delete);
 
 module.exports = messageRouter;

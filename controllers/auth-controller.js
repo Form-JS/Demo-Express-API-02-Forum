@@ -2,6 +2,7 @@ const db = require('../models');
 const bcrypt = require('bcrypt');
 const { Op } = require('sequelize');
 const { ErrorResponse } = require('../response-schemas/error-schema');
+const { generateJWT } = require('../utils/jwt-utils');
 
 const authController = {
 
@@ -13,8 +14,14 @@ const authController = {
         // Ajout en DB
         const member = await db.Member.create({ pseudo, email, password });
 
-        // FIXME Replace by JWT !!!!!!!!!!!
-        res.json(member);
+        // Création d'un « Json Web Token »
+        const token = generateJWT({
+            id: member.id,
+            pseudo: member.pseudo,
+            isAdmin: member.isAdmin
+        });
+
+        res.json(token);
     },
 
     login: async (req, res) => {
@@ -48,8 +55,14 @@ const authController = {
             return res.status(422).json(new ErrorResponse('Bad credential', 422));
         }
 
-        // FIXME Replace by JWT !!!!!!!!!!!
-        res.json(member);
+        // Création d'un « Json Web Token »
+        const token = generateJWT({
+            id: member.id,
+            pseudo: member.pseudo,
+            isAdmin: member.isAdmin
+        });
+
+        res.json(token);
     }
 };
 

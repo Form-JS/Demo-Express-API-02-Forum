@@ -9,23 +9,23 @@ const subjectRouter = require('express').Router();
 // Routes principals
 subjectRouter.route('/')
     .get(subjectController.getAll)
-    .post(bodyValidation(subjectValidator), subjectController.add);
+    .post(authentificateJwt(), bodyValidation(subjectValidator), subjectController.add);
 
 subjectRouter.route('/:id([0-9]+)')
     .get(subjectController.getOne)
-    .put(bodyValidation(subjectUpdateValidator), subjectController.update)
-    .delete(subjectController.delete);
+    .put(authentificateJwt(), bodyValidation(subjectUpdateValidator), subjectController.update)
+    .delete(authentificateJwt(), subjectController.delete);
 
 // Routes pour les categories
 subjectRouter.route('/:id([0-9]+)/AddCategories')
-    .post(bodyValidation(subjectCategoriesValidator), subjectController.addCategories);
+    .post(authentificateJwt(), bodyValidation(subjectCategoriesValidator), subjectController.addCategories);
 
 subjectRouter.route('/:id([0-9]+)/RemoveCategories')
-    .post(bodyValidation(subjectCategoriesValidator), subjectController.removeCategories);
+    .post(authentificateJwt(), bodyValidation(subjectCategoriesValidator), subjectController.removeCategories);
 
 // Routes pour les messages
 subjectRouter.route('/:id([0-9]+)/message')
     .get(subjectController.getAllMessage)
-    .post(bodyValidation(messageValidator), subjectController.addMessage);
+    .post(authentificateJwt(), bodyValidation(messageValidator), subjectController.addMessage);
 
 module.exports = subjectRouter;
