@@ -1,5 +1,7 @@
 const express = require('express');
 const pagination = require('./middlewares/pagination-middleware');
+
+// Permet d'avoir une propagation des erreurs avec les async/await dans express
 require('express-async-errors');
 
 // Load env file

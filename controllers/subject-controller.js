@@ -2,6 +2,8 @@ const db = require('../models');
 const { NotFoundErrorResponse, ErrorResponse } = require('../response-schemas/error-schema');
 const { SuccessArrayResponse, SuccessObjectResponse } = require('../response-schemas/succes-schema');
 
+// TODO Modifier les méthodes pour utiliser le JWT
+
 const subjectController = {
 
     // Actions principals

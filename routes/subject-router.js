@@ -6,6 +6,10 @@ const { subjectValidator, subjectUpdateValidator, subjectCategoriesValidator } =
 
 const subjectRouter = require('express').Router();
 
+// Routing pour les sujets
+// - Récuperation des données avec les méthodes GET
+// - Ajout et modification des données pour les personnes identifiées 
+
 // Routes principals
 subjectRouter.route('/')
     .get(subjectController.getAll)

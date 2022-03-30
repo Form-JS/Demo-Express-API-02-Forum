@@ -7,28 +7,31 @@ const { generateJWT } = require('../utils/jwt-utils');
 const authController = {
 
     register: async (req, res) => {
-        // Recup data + Hash Pwd
+        // Recuperation des données
         const { pseudo, email } = req.validatedData;
+
+        // Hashage du mot de passe à l'aide de "bcrypt"
         const password = await bcrypt.hash(req.validatedData.password, 10);
 
-        // Ajout en DB
+        // Création du compte en base de données
         const member = await db.Member.create({ pseudo, email, password });
 
-        // Création d'un « Json Web Token »
+        // Génération d'un « Json Web Token »
         const token = generateJWT({
             id: member.id,
             pseudo: member.pseudo,
             isAdmin: member.isAdmin
         });
 
+        // Envoi du token
         res.json(token);
     },
 
     login: async (req, res) => {
-        // Recup data + Hash Pwd
+        // Recuperation des données
         const { identifier, password } = req.validatedData;
 
-        // Get Member from DB
+        // Récuperation du compte "member" à l'aide du pseudo ou de l'email
         const member = await db.Member.findOne({
             where: {    // Condition avec un OU en SQL
                 [Op.or]: [
@@ -42,26 +45,27 @@ const authController = {
             }
         });
 
-        // Si le member n'existe pas ('Identifier' invalide)
+        // Erreur 422, si le member n'existe pas (pseudo ou email invalide)
         if (!member) {
             return res.status(422).json(new ErrorResponse('Bad credential', 422));
         }
 
-        // Si le member existe: Check le password via bcrypt
+        // Si le member existe: Vérification du password via "bcrypt"
         const isValid = await bcrypt.compare(password, member.password);
 
-        // Si le mot de passe n'est pas valide
+        // Erreur 422, si le mot de passe ne correspond pas au hashage
         if (!isValid) {
             return res.status(422).json(new ErrorResponse('Bad credential', 422));
         }
 
-        // Création d'un « Json Web Token »
+        // Génération d'un « Json Web Token »
         const token = generateJWT({
             id: member.id,
             pseudo: member.pseudo,
             isAdmin: member.isAdmin
         });
 
+        // Envoi du token
         res.json(token);
     }
 };

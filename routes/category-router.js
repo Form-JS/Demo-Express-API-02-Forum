@@ -3,7 +3,12 @@ const { authentificateJwt } = require('../middlewares/authentificate-jwt');
 const bodyValidation = require('../middlewares/body-validation-middleware');
 const { categoryValidator } = require('../validators/category-validator');
 
+
 const categoryRouter = require('express').Router();
+
+// Routing pour les catégories
+// - Récuperation des données avec les méthodes GET
+// - Modification autorisé uniquement pour les admin
 
 categoryRouter.route('/')
     .get(categoryController.getAll)

@@ -5,6 +5,10 @@ const { registerValidator, loginValidator } = require('../validators/auth-valida
 
 const authRouter = require('express').Router();
 
+// Routing pour les acces utilisateur
+// - Route "/register" pour créer un compte et récuperer un token d'identification
+// - Route "/login" pour obtenir un JSON Web Token d'identification
+
 authRouter.route('/register')
     .post(bodyValidation(registerValidator), authController.register);
 
