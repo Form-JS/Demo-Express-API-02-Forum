@@ -146,7 +146,12 @@ const subjectController = {
         const data = req.validatedData;
 
         // Récuperation du sujet
-        const subject = await db.Subject.findByPk(id);
+        const subject = await db.Subject.findByPk(id, {
+            include: {
+                model: db.Category,
+                through: { attributes: [] }
+            }
+        });
 
         // Si non trouvé -> 404
         if (!subject) {
@@ -158,18 +163,39 @@ const subjectController = {
             return res.sendStatus(403);
         }
 
+        // Si la catégorie existe déjà, renvoyer une erreur 400
+        const hasDuplicate = subject.categories
+            .map(c => c.id)
+            .find(id => data.categories.includes(id));
+
+        if (hasDuplicate) {
+            return res.status(400).json(new ErrorResponse('La catégorie existe deja !'));
+        }
+
         // Ajout de la categorie avec la méthode généré automatiquement par sequelize
         await subject.addCategory(data.categories);
 
         // Version au singulier et au pluriel possible :
         // -> subject.addCategories(data.categories);
 
-        res.json(new SuccessObjectResponse(subject));
+        // Récuperation des données après les mise à jours
+        const subjectAfter = await db.Subject.findByPk(id, {
+            include: [{
+                model: db.Category,
+                through: { attributes: [] }
+            }, {
+                model: db.Member,
+                attributes: ['id', 'pseudo']
+            }]
+        });
+
+        res.json(new SuccessObjectResponse(subjectAfter));
     },
 
     removeCategories: async (req, res) => {
         const id = parseInt(req.params.id);
         const data = req.validatedData;
+        const memberId = req.user.id;
 
         // Récuperation du sujet
         const subject = await db.Subject.findByPk(id);

@@ -1,15 +1,23 @@
+const { Op } = require('sequelize');
 const db = require('../models');
 const { NotFoundErrorResponse, ErrorResponse } = require('../response-schemas/error-schema');
 const { SuccessObjectResponse } = require('../response-schemas/succes-schema');
 
-// TODO Modifier les méthodes pour utiliser le JWT
 
 const messageController = {
 
     getById: async (req, res) => {
         const id = parseInt(req.params.id);
 
-        const message = await db.Message.findByPk(id);
+        const message = await db.Message.findByPk(id, {
+            include: {
+                model: db.Member,
+                attributes: ['id', 'pseudo']
+            },
+            attributes: {
+                exclude: ['memberId']
+            }
+        });
         if (!message) {
             return res.status(404).json(new NotFoundErrorResponse('Message not found'));
         }
@@ -20,9 +28,17 @@ const messageController = {
     update: async (req, res) => {
         const id = parseInt(req.params.id);
         const data = req.validatedData;
+        const memberId = req.user.id;
+
+
 
         const [nbRow, updatedData] = await db.Message.update(data, {
-            where: { id },
+            where: {
+                [Op.and]: [
+                    { id },
+                    { memberId }
+                ]
+            },
             returning: true
         });
 
@@ -35,14 +51,20 @@ const messageController = {
 
     delete: async (req, res) => {
         const id = parseInt(req.params.id);
+        const { id: memberId, isAdmin } = req.user;
 
-        const nbRow = await db.Message.destroy({
-            where: { id }
-        });
+        const target = await db.Message.findByPk(id);
 
-        if (nbRow !== 1) {
-            return res.status(400).json(new ErrorResponse('Error during update'));
+        if (!target) {
+            return res.status(404).json(new NotFoundErrorResponse('message not found'));
         }
+
+        if (!(target.memberId === memberId || isAdmin)) {
+            return res.sendStatus(403);
+        }
+
+        // Bien joué Ayan! 
+        await target.destroy();
 
         res.sendStatus(204);
     }
