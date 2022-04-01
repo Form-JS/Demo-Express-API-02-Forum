@@ -1,8 +1,8 @@
+const { Op } = require('sequelize');
 const db = require('../models');
 const { NotFoundErrorResponse, ErrorResponse } = require('../response-schemas/error-schema');
 const { SuccessArrayResponse, SuccessObjectResponse } = require('../response-schemas/succes-schema');
 
-// TODO Modifier les méthodes pour utiliser le JWT
 
 const subjectController = {
 
@@ -15,10 +15,13 @@ const subjectController = {
             offset,
             limit,
             // include: db.Category           // Many to Many avec toutes les infos (donc la table intermediaire)
-            include: {                        // Many to Many customisé
+            include: [{                        // Many to Many customisé
                 model: db.Category,
                 through: { attributes: [] },  // -> Permet de selectionner les infos de la table intermediaire
-            }
+            }, {
+                model: db.Member,
+                attributes: ['id', 'pseudo']
+            }]
         });
         res.json(new SuccessArrayResponse(rows, count));
     },
@@ -27,10 +30,13 @@ const subjectController = {
         const id = parseInt(req.params.id);
 
         const subject = await db.Subject.findByPk(id, {
-            include: {
+            include: [{
                 model: db.Category,
                 through: { attributes: [] }
-            }
+            }, {
+                model: db.Member,
+                attributes: ['id', 'pseudo']
+            }]
         });
 
         if (!subject) {
@@ -41,7 +47,11 @@ const subjectController = {
     },
 
     add: async (req, res) => {
+        // Récuperation des donnée à ajouter en DB
         const data = req.validatedData;
+
+        // Récuperation des données liée au login
+        data.memberId = req.user.id;
 
         // Ajout d'une transaction
         // -> Sécurité pour s'assuré que toutes les opérations DB soit réalisé ou aucunne
@@ -71,12 +81,18 @@ const subjectController = {
 
     update: async (req, res) => {
         const id = parseInt(req.params.id);
+        const memberId = req.user.id;
         const data = req.validatedData;
 
         const transaction = await db.sequelize.transaction();
 
         const [nbRow, updatedData] = await db.Subject.update(data, {
-            where: { id },
+            where: {
+                [Op.and]: [
+                    { id },         // Id de l'element 
+                    { memberId }    // Id du membre qui a créer le sujet
+                ]
+            },
             returning: true, // Permet d'obtenir 'updatedData' (Only MSSQL & PostgreSQL)
             transaction
         });
@@ -92,8 +108,23 @@ const subjectController = {
 
     delete: async (req, res) => {
         const id = parseInt(req.params.id);
+        const { id: memberId, isAdmin } = req.user;
+
+        const target = await db.Subject.findByPk(id);
+        if (!target) {
+            return res.status(404).json(new NotFoundErrorResponse('Subject not found'));
+        }
+
+        if (target.memberId !== memberId && !isAdmin) {
+            return res.sendStatus(403);
+        }
+
+        // ↓ Alternative pour supprimer l'element
+        // Etant donnée que l'instance est connu, il possible d'utiliser la méthode destroy
+        // => await target.destroy({transaction});
 
         const transaction = await db.sequelize.transaction();
+
         const nbRow = await db.Subject.destroy({
             where: { id },
             transaction
@@ -111,6 +142,7 @@ const subjectController = {
     // Manipulation des categories
     addCategories: async (req, res) => {
         const id = parseInt(req.params.id);
+        const memberId = req.user.id;
         const data = req.validatedData;
 
         // Récuperation du sujet
@@ -119,6 +151,11 @@ const subjectController = {
         // Si non trouvé -> 404
         if (!subject) {
             return res.status(404).json(new NotFoundErrorResponse('Subject not found'));
+        }
+
+        // Si on n'est pas auteur du sujet -> 403
+        if (subject.memberId !== memberId) {
+            return res.sendStatus(403);
         }
 
         // Ajout de la categorie avec la méthode généré automatiquement par sequelize
@@ -140,6 +177,11 @@ const subjectController = {
         // Si non trouvé -> 404
         if (!subject) {
             return res.status(404).json(new NotFoundErrorResponse('Subject not found'));
+        }
+
+        // Si on n'est pas auteur du sujet -> 403
+        if (subject.memberId !== memberId) {
+            return res.sendStatus(403);
         }
 
         // Ajout de la categorie avec la méthode généré automatiquement par sequelize
@@ -172,6 +214,9 @@ const subjectController = {
     addMessage: async (req, res) => {
         const subjectId = parseInt(req.params.id);
         const data = req.validatedData;
+
+        // Ajout du memberId dans les données via le JWT
+        data.memberId = req.user.id;
 
         const subject = await db.Subject.findByPk(subjectId);
         if (!subject) {

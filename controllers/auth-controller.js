@@ -10,9 +10,6 @@ const authController = {
         // Recuperation des données
         const { pseudo, email } = req.validatedData;
 
-
-        console.log(req.validatedData);
-
         // Hashage du mot de passe à l'aide de "bcrypt"
         const password = await bcrypt.hash(req.validatedData.password, 10);
 
