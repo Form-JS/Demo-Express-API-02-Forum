@@ -7,7 +7,7 @@ const { Op } = require('sequelize');
  * @param {{adminRight: boolean}} options 
  * @returns {(req: Request, res: Response, next: NextFunction) => Void}
  */
-const authentificateJwt = ({ adminRight = false }) => {
+const authentificateJwt = (options = { adminRight: false }) => {
 
     /**
       * Middleware pour gérer les jwt
@@ -40,7 +40,7 @@ const authentificateJwt = ({ adminRight = false }) => {
         }
 
         // Vérification des droits de l'utilisateur si le flag "AdminRight" est présent
-        if (adminRight) {
+        if (options.adminRight) {
             // Validation des droits via la base de donnée 
             // -> Certitude d'avoir les données à jours
             const admin = await db.Member.findOne({

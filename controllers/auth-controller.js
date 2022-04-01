@@ -10,6 +10,9 @@ const authController = {
         // Recuperation des données
         const { pseudo, email } = req.validatedData;
 
+
+        console.log(req.validatedData);
+
         // Hashage du mot de passe à l'aide de "bcrypt"
         const password = await bcrypt.hash(req.validatedData.password, 10);
 
@@ -17,7 +20,7 @@ const authController = {
         const member = await db.Member.create({ pseudo, email, password });
 
         // Génération d'un « Json Web Token »
-        const token = generateJWT({
+        const token = await generateJWT({
             id: member.id,
             pseudo: member.pseudo,
             isAdmin: member.isAdmin
@@ -35,11 +38,11 @@ const authController = {
         const member = await db.Member.findOne({
             where: {    // Condition avec un OU en SQL
                 [Op.or]: [
-                    {   // Test du pseudo avec l'operateur LIKE
-                        pseudo: { [Op.like]: identifier }
+                    {   // Test du pseudo avec une egalité stricte (implicite)
+                        pseudo: identifier
                     },
-                    {   // Test de l'email avec l'operateur LIKE
-                        email: { [Op.like]: identifier }
+                    {   // Test de l'email avec l'operateur EQUALS
+                        email: { [Op.eq]: identifier.toLowerCase() }
                     }
                 ]
             }
@@ -59,7 +62,7 @@ const authController = {
         }
 
         // Génération d'un « Json Web Token »
-        const token = generateJWT({
+        const token = await generateJWT({
             id: member.id,
             pseudo: member.pseudo,
             isAdmin: member.isAdmin

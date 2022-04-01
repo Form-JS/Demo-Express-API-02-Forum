@@ -1,4 +1,5 @@
 const subjectController = require('../controllers/subject-controller');
+const { authentificateJwt } = require('../middlewares/authentificate-jwt');
 const bodyValidation = require('../middlewares/body-validation-middleware');
 const { messageValidator } = require('../validators/message-validator');
 const { subjectValidator, subjectUpdateValidator, subjectCategoriesValidator } = require('../validators/subject-validator');
