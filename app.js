@@ -1,5 +1,6 @@
 const express = require('express');
 const pagination = require('./middlewares/pagination-middleware');
+const cors = require('cors');
 
 // Permet d'avoir une propagation des erreurs avec les async/await dans express
 require('express-async-errors');
@@ -16,6 +17,7 @@ const app = express();
 // Add Middlewares
 app.use(express.json());
 app.use(pagination());
+app.use(cors());
 
 // Initialize Database
 const db = require('./models');
