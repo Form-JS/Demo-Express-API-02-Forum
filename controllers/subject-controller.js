@@ -84,6 +84,11 @@ const subjectController = {
         const memberId = req.user.id;
         const data = req.validatedData;
 
+        const subject = await db.Subject.findByPk(subjectId);
+        if (!subject) {
+            return res.status(404).json(new NotFoundErrorResponse('Subject not found'));
+        }
+
         const transaction = await db.sequelize.transaction();
 
         const [nbRow, updatedData] = await db.Subject.update(data, {
@@ -223,6 +228,11 @@ const subjectController = {
     getAllMessage: async (req, res) => {
         const subjectId = parseInt(req.params.id);
         const { offset, limit } = req.pagination;
+
+        const subject = await db.Subject.findByPk(subjectId);
+        if (!subject) {
+            return res.status(404).json(new NotFoundErrorResponse('Subject not found'));
+        }
 
         const { rows, count } = await db.Message.findAndCountAll({
             attributes: {
