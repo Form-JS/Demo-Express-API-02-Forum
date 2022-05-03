@@ -4,6 +4,14 @@ const { Op } = require('sequelize');
 const { ErrorResponse } = require('../response-schemas/error-schema');
 const { generateJWT } = require('../utils/jwt-utils');
 
+const tokenGenerator = (member) => {
+    return generateJWT({
+        id: member.id,
+        pseudo: member.pseudo,
+        isAdmin: member.isAdmin
+    });
+};
+
 const authController = {
 
     register: async (req, res) => {
@@ -17,11 +25,7 @@ const authController = {
         const member = await db.Member.create({ pseudo, email, password });
 
         // Génération d'un « Json Web Token »
-        const token = await generateJWT({
-            id: member.id,
-            pseudo: member.pseudo,
-            isAdmin: member.isAdmin
-        });
+        const token = await tokenGenerator(member);
 
         // Envoi du token
         res.json(token);
@@ -59,11 +63,21 @@ const authController = {
         }
 
         // Génération d'un « Json Web Token »
-        const token = await generateJWT({
-            id: member.id,
-            pseudo: member.pseudo,
-            isAdmin: member.isAdmin
-        });
+        const token = await tokenGenerator(member);
+
+        // Envoi du token
+        res.json(token);
+    },
+
+    refresh: async (req, res) => {
+        // Récuperation de l'id du membre
+        const { id: memberId } = req.user;
+
+        // Récuperation du compte "member" à l'aide de l'id du token
+        const member = await db.Member.findByPk(memberId);
+
+        // Génération d'un « Json Web Token »
+        const token = await tokenGenerator(member);
 
         // Envoi du token
         res.json(token);
