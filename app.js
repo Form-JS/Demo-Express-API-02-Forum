@@ -34,6 +34,15 @@ if (NODE_ENV !== 'production') {
 const router = require('./routes');
 app.use('/api', router);
 
+// Add Error Handler
+app.use((error, req, res, next) => {
+    if (process.env.NODE_ENV === 'development') {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+    res.sendStatus(500);
+});
+
 // Start Web API
 app.listen(PORT, () => {
     console.log(`Web API up on port ${PORT}  [${NODE_ENV}]`);
