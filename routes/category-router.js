@@ -1,5 +1,5 @@
 const categoryController = require('../controllers/category-controller');
-const { authentificateJwt } = require('../middlewares/authentificate-jwt');
+const authentificateJwt = require('../middlewares/authentificate-jwt');
 const bodyValidation = require('../middlewares/body-validation-middleware');
 const { categoryValidator } = require('../validators/category-validator');
 
