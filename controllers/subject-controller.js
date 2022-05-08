@@ -271,8 +271,18 @@ const subjectController = {
 
         const transaction = await db.sequelize.transaction();
         try {
-            const message = await subject.createMessage(data, { transaction });
+            const newMessage = await subject.createMessage(data, { transaction });
             await transaction.commit();
+
+            const message = await db.Message.findByPk( newMessage.id,{
+                attributes: {
+                    exclude: ['subjectId', 'memberId']
+                },
+                include: [{
+                    model: db.Member,
+                    attributes: ['id', 'pseudo']
+                }]
+            });
 
             res.json(new SuccessObjectResponse(message));
         }
