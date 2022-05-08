@@ -20,8 +20,11 @@ const subjectController = {
                 through: { attributes: [] },  // -> Permet de selectionner les infos de la table intermediaire
             }, {
                 model: db.Member,
-                attributes: ['id', 'pseudo']
-            }]
+                attributes: ['id', 'pseudo'],
+            }],
+            attributes: {
+                exclude: ['memberId']
+            }
         });
         res.json(new SuccessArrayResponse(rows, count));
     },
@@ -36,7 +39,10 @@ const subjectController = {
             }, {
                 model: db.Member,
                 attributes: ['id', 'pseudo']
-            }]
+            }],
+            attributes: {
+                exclude: ['memberId']
+            }
         });
 
         if (!subject) {
@@ -236,10 +242,14 @@ const subjectController = {
 
         const { rows, count } = await db.Message.findAndCountAll({
             attributes: {
-                exclude: ['subjectId']
+                exclude: ['subjectId', 'memberId']
             },
             where: { subjectId },
             order: [['createdAt', 'DESC']],
+            include: [{
+                model: db.Member,
+                attributes: ['id', 'pseudo']
+            }],
             offset,
             limit
         });
