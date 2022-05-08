@@ -84,7 +84,7 @@ const subjectController = {
         const memberId = req.user.id;
         const data = req.validatedData;
 
-        const subject = await db.Subject.findByPk(subjectId);
+        const subject = await db.Subject.findByPk(id);
         if (!subject) {
             return res.status(404).json(new NotFoundErrorResponse('Subject not found'));
         }
